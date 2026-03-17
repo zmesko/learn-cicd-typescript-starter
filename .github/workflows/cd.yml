@@ -10,6 +10,9 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
 
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -38,6 +41,9 @@ jobs:
 
       - name: Google Artifect Registry build
         run: gcloud builds submit --tag us-central1-docker.pkg.dev/tactile-reason-490415-u7/notely-ar-repo/notely:latest .
+
+      - name: Migration
+        run: npm run db:migrate
 
       - name: Deploy to Cloud run
         run: gcloud run deploy notely --image us-central1-docker.pkg.dev/tactile-reason-490415-u7/notely-ar-repo/notely:latest --region us-central1 --allow-unauthenticated --project tactile-reason-490415-u7 --max-instances=4
